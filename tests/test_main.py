@@ -55,3 +55,7 @@ class TestDoorbot:
         response = client.get("/access/door/fob_id/953ghf3n?version=1.0")
         assert response.status_code == 403
         assert response.json() == {"detail":"user not on door access list"}
+
+class TestToolbot:
+    def test_toolbot(self):
+        pass
