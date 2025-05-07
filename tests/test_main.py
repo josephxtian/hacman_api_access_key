@@ -3,7 +3,39 @@ from main import app
 
 client = TestClient(app)
 
-def test_api_status():
-    response = client.get("/v1/status/")
-    assert response.status_code == 200
-    assert response.json() == "API is online and working"
+class TestCheckAPIStatus:
+    def test_check_api_status(self):
+        response = client.get("/v1.0/status/")
+        assert response.status_code == 200
+        assert response.json() == {"body":"API is online and working"}
+
+class TestDoorbot:
+# test with no announce name
+    def test_doorbot_without_announce_name(self):
+        response = client.get("/v1.0/access/door/fob_id/ff8d0h4749")
+        assert response.status_code == 202
+        assert response.json() == {"announce_name": '', "member_id":663}
+
+# test with announce name
+    def test_doorbot_with_announce_name(self):
+        response = client.get("/v1.0/access/door/fob_id/ff8d0h4326")
+        assert response.status_code == 202
+        assert response.json() == {"announce_name": 'canene', "member_id":188}
+
+# test with announce emoji
+    def test_doorbot_with_emoji_announce_name(self):
+        response = client.get("/v1.0/access/door/fob_id/088dfh4b")
+        assert response.status_code == 202
+        assert response.json() == {"announce_name": '♂️', "member_id":930}
+
+# test with incorrect fob_id
+    def test_doorbot_with_false_keyfob(self):
+        response = client.get("/v1.0/access/door/fob_id/953ghf3n")
+        assert response.status_code == 403
+        assert response.json() == {"detail":"user not on door access list"}
+
+# test with partial fob_id
+    def test_doorbot_with_false_keyfob(self):
+        response = client.get("/v1.0/access/door/fob_id/088d")
+        assert response.status_code == 403
+        assert response.json() == {"detail":"user not on door access list"}
