@@ -4,6 +4,16 @@ from main import latest_version
 
 client = TestClient(app)
 
+class TestAPIRoot:
+    def test_api_root(self):
+        response = client.get("/")
+        assert response.status_code == 200
+        assert response.json() == {
+        "documentation":"/docs",
+        "author":"https://github.com/josephxtian/",
+        "latest_version":latest_version
+        }
+
 class TestCheckAPIStatus:
     def test_check_api_status(self):
         response = client.get("/status/")
