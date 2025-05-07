@@ -10,12 +10,15 @@ def root():
 
 
 # #doorbot
-# @app.get("/v1/access/door/fob_id/{fob_id}")
-# async def root():
-#     return {"message": "Hello World"}
+@app.get("/v1/access/door/fob_id/{fob_id}")
+async def root():
+    return {"message": "Hello World"}
 
 
 # #toolbot
-# @app.get("/v1/access/tool/fob_id/{fob_id}")
-# async def root():
-#     return {"message": "Hello World"}
+@app.get("/v1/access/tool/fob_id/{fob_id}")
+async def root():
+    return {"message": "Hello World"}
+
+if __name__ == "__main__":
+    main()
