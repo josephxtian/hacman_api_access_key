@@ -1,2 +1,4 @@
 test_door_information.csv
 test_tool_information.csv
+venv
+__pycache__
