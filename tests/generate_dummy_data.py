@@ -15,6 +15,7 @@ duplicate_list_for_pin_codes = True
 
 count = 0
 x = Xeger()
+# starter fob_id
 fob_id = "e85d2h4s"
 
 y = Xeger(limit=8)
@@ -37,10 +38,10 @@ def member_id_func():
 
 with open("dev_doorbot_lines.csv",'w',newline='') as doorbot_file:
     doorbot_writer = csv.writer(doorbot_file, delimiter=',')
-    doorbot_writer.writerow(["key_id","announce_name","id"])
+    doorbot_writer.writerow(["fob_id","announce_name","id"])
     with open("dev_toolbot_lines.csv",'w',newline='') as toolbot_file:
         toolbot_writer = csv.writer(toolbot_file, delimiter=',')
-        toolbot_writer.writerow(["key_id","tool_id","announce_name","id"])
+        toolbot_writer.writerow(["fob_id","tool_id","announce_name","id"])
         while count < num_of_doorbot_lines:
             # check if previous fob_id had 'b' in it.
             # if it did, generate a pin code, for randomness
