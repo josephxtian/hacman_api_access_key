@@ -2,14 +2,21 @@ import csv
 from fastapi import FastAPI, status, HTTPException, Response, Header
 from pydantic import BaseModel
 
-env = "dev_"
+env = "dev"
 latest_version = 1.0
+
+doorbot_filename = "_door_information.csv"
+toolbot_filename = "_toolbot_lines.csv"
+toolbot_id_api_filname = "_tool_api_keys.csv"
 
 app = FastAPI()
 
 class AccessOutput(BaseModel):
     announce_name: str
     member_id: int
+
+class ToolbotRequest(BaseModel):
+    api_key: str
 
 # API root
 @app.get("/",status_code=status.HTTP_200_OK)
@@ -37,34 +44,49 @@ def check_api_status(response:Response):
 def doorbot_request(fob_id: str, response:Response, version: float = latest_version):
     response.headers["Version"] = '1.0'
     if version == 1.0:
-        with open(f'{env}door_information.csv','r',) as file:
+        with open(f'{env}{doorbot_filename}','r',) as file:
             door_list = csv.reader(file)
             for row in door_list:
                 if fob_id == row[0]:
                     return {"announce_name": row[1], "member_id":row[2]}
                 
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail ="user not on door access list")
+                                detail ="user not on door access list",headers={"Version":"1.0"})
             # 403 Forbidden
             # The client does not have access rights to the content,
             # the server is refusing to give the requested resource.
             # Unlike 401, the client's identity is known to the server.
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail = "Invalid API version, refer to API docs",headers={"Version":"1.0"})
 
 
-# toolbot DRAFT
-@app.get("/access/tool/{tool}/fob_id/{fob_id}", status_code = status.HTTP_202_ACCEPTED, response_model=AccessOutput)
-def toolbot_request(fob_id: str, response:Response, version: float = latest_version):
+# toolbot Post Request
+@app.post("/access/tool/fob_id/{fob_id}", status_code = status.HTTP_202_ACCEPTED, response_model=AccessOutput)
+def toolbot_request(fob_id: str, request:ToolbotRequest, response:Response, version: float = latest_version):
     response.headers["Version"] = '1.0'
     if version == 1.0:
-        with open(f'{env}tool_information.csv','r',) as file:
-            tool_access_list = csv.reader(file)
+        # check if API key is valid and match to tool ID
+        with open(f'{env}{toolbot_id_api_filname}','r',) as tool_api_keys:
+            tool_ids = csv.reader(tool_api_keys)
+            for row in tool_ids:
+                if request.api_key in row[1]:
+                    tool_id = row[0]
+                    break
+            else:
+                raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,detail="API key not recognised",headers={"Version":"1.0"})
+        # check if user can use tool
+        with open(f'{env}{toolbot_filename}','r',) as tool_info:
+            tool_access_list = csv.reader(tool_info)
             for row in tool_access_list:
-                if fob_id == row[0]:
-                    return {"announce_name": row[1], "member_id":row[2]}
+                if fob_id == row[0] and tool_id == row[1]:
+                    return {"announce_name": row[2], "member_id":row[3]}
                 
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,
-                                detail ="user not on tool access list")
-            # 403 Forbidden
-            # The client does not have access rights to the content,
-            # the server is refusing to give the requested resource.
-            # Unlike 401, the client's identity is known to the server.
+                                detail ="Forbidden - user not on this tools access list",
+                                headers={"Version":"1.0"})
+    # if version number is not valid
+    else:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                            detail = "Invalid API version, refer to API docs",
+                            headers={"Version":"1.0"})
