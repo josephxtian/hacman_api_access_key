@@ -1,9 +1,10 @@
 # hacman_api_access_key
 
-Full API reference docs can be found at /docs
-
 ## api.local/
 Root directory
+
+## api.local/docs
+Full API reference docs
 
 ## api.local/status
 Check if the api is working.
