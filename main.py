@@ -5,7 +5,7 @@ from pydantic import BaseModel
 env = "dev"
 latest_version = 1.0
 
-doorbot_filename = "_door_information.csv"
+doorbot_filename = "_doorbot_lines.csv"
 toolbot_filename = "_toolbot_lines.csv"
 toolbot_id_api_filname = "_tool_api_keys.csv"
 
