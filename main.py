@@ -60,7 +60,7 @@ def doorbot_request(fob_id: str, response:Response, version: float = latest_vers
 
 # toolbot Post Request v1.0
 @app.post("/access/tool/fob_id/{fob_id}", status_code = status.HTTP_202_ACCEPTED, response_model=AccessOutput)
-def toolbot_request(fob_id: str, response:Response, api_key:str = Body(embed=True), version: float = latest_version):
+def toolbot_request(fob_id: str, response:Response, api_key:str = Body(embed=True,title="API key",), version: float = latest_version):
     response.headers["Version"] = '1.0'
     if version == 1.0:
         # check if API key is valid and match to tool ID

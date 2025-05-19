@@ -129,3 +129,11 @@ class TestToolbot:
             )
         assert response.status_code == 400
         assert response.json() == {"detail":"Invalid API version, refer to API docs"}
+
+    def test_toolbot_with_invalid_data_type_api_key(self):
+        response = client.post(
+            "/access/tool/fob_id/fnjlajpx",
+            json = {"api_key":2344221},
+            )
+        assert response.status_code == 422
+        assert response.json() == {'detail': [{'input': 2344221,'loc': ['body', 'api_key'],'msg': 'Input should be a valid string','type': 'string_type'}]}
