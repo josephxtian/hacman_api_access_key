@@ -1,5 +1,5 @@
 import csv
-from fastapi import FastAPI, status, HTTPException, Response, Header
+from fastapi import FastAPI, status, HTTPException, Response, Header, Body
 from pydantic import BaseModel
 
 env = "dev"
@@ -14,9 +14,6 @@ app = FastAPI()
 class AccessOutput(BaseModel):
     announce_name: str
     member_id: int
-
-class ToolbotRequest(BaseModel):
-    api_key: str
 
 # API root
 @app.get("/",status_code=status.HTTP_200_OK)
@@ -38,7 +35,7 @@ def check_api_status(response:Response):
             }
 
 
-# Doorbot v1.0
+# Doorbot Get Request v1.0
 @app.get(
         "/access/door/fob_id/{fob_id}", status_code = status.HTTP_202_ACCEPTED, response_model=AccessOutput)
 def doorbot_request(fob_id: str, response:Response, version: float = latest_version):
@@ -61,16 +58,16 @@ def doorbot_request(fob_id: str, response:Response, version: float = latest_vers
                             detail = "Invalid API version, refer to API docs",headers={"Version":"1.0"})
 
 
-# toolbot Post Request
+# toolbot Post Request v1.0
 @app.post("/access/tool/fob_id/{fob_id}", status_code = status.HTTP_202_ACCEPTED, response_model=AccessOutput)
-def toolbot_request(fob_id: str, request:ToolbotRequest, response:Response, version: float = latest_version):
+def toolbot_request(fob_id: str, response:Response, api_key:str = Body(embed=True), version: float = latest_version):
     response.headers["Version"] = '1.0'
     if version == 1.0:
         # check if API key is valid and match to tool ID
         with open(f'{env}{toolbot_id_api_filname}','r',) as tool_api_keys:
             tool_ids = csv.reader(tool_api_keys)
             for row in tool_ids:
-                if request.api_key in row[1]:
+                if api_key in row[1]:
                     tool_id = row[0]
                     break
             else:

@@ -80,7 +80,7 @@ class TestToolbot:
     def test_toolbot_no_api_key(self):
         response = client.post("/access/tool/fob_id/fnjlajpx")
         assert response.status_code == 422
-        assert response.json() == {'detail': [{'type': 'missing', 'loc': ['body'], 'msg': 'Field required', 'input': None}]}
+        assert response.json() == {'detail': [{'input': None, 'loc': ['body', 'api_key'], 'msg': 'Field required', 'type': 'missing'}]}
 
     def test_toolbot_with_api_key(self):
         response = client.post(
